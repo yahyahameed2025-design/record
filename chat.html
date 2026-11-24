@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#5b5bf0">
+<title>دردشة المعلمين | نظام الغياب الذكي</title>
+<script>(function(){try{var t=JSON.parse(localStorage.getItem('uiTheme'));if(!t&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== نظام الغياب الذكي — التصميم الموحد ===== */
+:root{
+  --primary:#5b5bf0; --primary-2:#8b5cf6; --primary-soft:#eef0ff; --primary-ink:#3730a3;
+  --success:#10b981; --success-soft:#dcfce7; --warning:#f59e0b; --warning-soft:#fef3c7;
+  --danger:#ef4444; --danger-soft:#fee2e2; --info:#0ea5e9; --info-soft:#e0f2fe;
+  --bg:#f5f6fb; --bg-2:#eceefa; --surface:#ffffff; --surface-2:#f8f9fd; --border:#e4e7f2;
+  --text:#1e1b4b; --text-2:#475569; --muted:#8a93ab;
+  --radius:18px; --radius-sm:12px;
+  --shadow:0 1px 2px rgba(30,27,75,.04),0 8px 24px rgba(30,27,75,.06);
+  --shadow-lg:0 20px 50px rgba(30,27,75,.18);
+  --grad:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color-scheme:light;
+}
+[data-theme="dark"]{
+  --primary:#7c7cff; --primary-2:#a78bfa; --primary-soft:#24244a; --primary-ink:#c7c9ff;
+  --success-soft:#0f3a2c; --warning-soft:#3d2f0b; --danger-soft:#3f1717; --info-soft:#0b2f42;
+  --bg:#0d0f1c; --bg-2:#141730; --surface:#161a2e; --surface-2:#1c2038; --border:#2a2f4d;
+  --text:#eef0ff; --text-2:#b8bfd9; --muted:#7d86a6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;line-height:1.6;padding-bottom:56px;
+  background-image:radial-gradient(circle at 100% 0,rgba(91,91,240,.10),transparent 40%),radial-gradient(circle at 0 100%,rgba(139,92,246,.08),transparent 45%);
+  background-attachment:fixed}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:var(--primary)}
+.hidden{display:none!important}
+
+/* ===== الشريط العلوي ===== */
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--surface) 85%,transparent);
+  backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;white-space:nowrap;text-decoration:none;color:var(--text)}
+.brand-logo{width:36px;height:36px;border-radius:11px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:18px;box-shadow:0 6px 16px rgba(91,91,240,.35)}
+.nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;padding:2px}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:10px;text-decoration:none;color:var(--text-2);font-weight:700;font-size:14px;white-space:nowrap;transition:.15s}
+.nav a:hover{background:var(--surface-2);color:var(--text)}
+.nav a.active{background:var(--primary-soft);color:var(--primary-ink)}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:grid;place-items:center;font-size:17px;flex-shrink:0;transition:.15s}
+.icon-btn:hover{border-color:var(--primary);transform:translateY(-1px)}
+
+/* ===== التخطيط ===== */
+.page{max-width:1280px;margin:0 auto;padding:24px 20px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.page-title{margin:0;font-size:28px;font-weight:900;letter-spacing:-.3px}
+.page-sub{margin:4px 0 0;color:var(--muted);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.card-title{margin:0 0 14px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+.grid{display:grid;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+
+/* ===== البطاقات الإحصائية ===== */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.stat-ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.stat-label{color:var(--muted);font-weight:700;font-size:13px}
+.stat-value{font-size:26px;font-weight:900;line-height:1.1}
+.tone-primary{background:var(--primary-soft);color:var(--primary)}
+.tone-success{background:var(--success-soft);color:var(--success)}
+.tone-warning{background:var(--warning-soft);color:var(--warning)}
+.tone-danger{background:var(--danger-soft);color:var(--danger)}
+.tone-info{background:var(--info-soft);color:var(--info)}
+
+/* ===== الأزرار والحقول ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent;border-radius:12px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;transition:.15s;white-space:nowrap;text-decoration:none;line-height:1.2}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 6px 16px rgba(91,91,240,.28)}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 22px rgba(91,91,240,.36)}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
+.btn-ghost:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+.btn-soft{background:var(--primary-soft);color:var(--primary-ink)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger-soft{background:var(--danger-soft);color:var(--danger)}
+.btn-danger-soft:hover:not(:disabled){background:var(--danger);color:#fff}
+.btn-sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.btn-block{width:100%}
+.field{position:relative}
+.input,.select,.textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);outline:none;transition:.15s;font-size:15px}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 15%,transparent)}
+.search{padding-inline-start:40px}
+.field .field-ico{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+
+/* ===== الشارات والرقائق ===== */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 13px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;user-select:none}
+.chip:hover{border-color:var(--primary)}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 13px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;color:var(--text-2)}
+.seg button.on{background:var(--surface);color:var(--primary-ink);box-shadow:var(--shadow)}
+
+/* ===== الجداول ===== */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+table.table{width:100%;border-collapse:collapse;font-size:15px}
+.table th{position:sticky;top:0;background:var(--surface-2);color:var(--text-2);font-weight:800;font-size:13px;text-align:right;padding:12px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr{transition:background .12s}
+.table tbody tr:hover{background:var(--surface-2)}
+
+/* ===== القوائم ===== */
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s}
+.item:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:var(--shadow)}
+.item.dim{opacity:.62}
+.avatar{width:42px;height:42px;border-radius:13px;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center;font-weight:900;flex-shrink:0}
+.item-main{flex:1;min-width:0}
+.item-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{color:var(--muted);font-size:13px;display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+
+/* ===== الحالات ===== */
+.empty{text-align:center;color:var(--muted);padding:48px 16px;font-weight:600}
+.empty-ico{font-size:42px;display:block;margin-bottom:8px;opacity:.7}
+.spinner{width:34px;height:34px;border:3.5px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{background:linear-gradient(90deg,var(--surface-2),var(--border),var(--surface-2));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:12px;height:58px}
+@keyframes sk{to{background-position:-200% 0}}
+.alert{padding:12px 16px;border-radius:12px;font-weight:700;display:flex;gap:10px;align-items:center}
+.alert-danger{background:var(--danger-soft);color:var(--danger)}
+.alert-warning{background:var(--warning-soft);color:#b45309}
+[data-theme="dark"] .alert-warning{color:var(--warning)}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ===== النوافذ المنبثقة ===== */
+.modal{position:fixed;inset:0;z-index:1000;background:rgba(13,15,40,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex;animation:fadeIn .2s}
+.modal-card{background:var(--surface);border-radius:22px;box-shadow:var(--shadow-lg);width:100%;max-width:520px;max-height:90vh;overflow:auto;padding:24px;border:1px solid var(--border)}
+.modal-card.sm{max-width:380px;text-align:center}
+.modal-title{margin:0 0 6px;font-size:20px;font-weight:900}
+.modal-text{color:var(--text-2);margin:0 0 18px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn{flex:1}
+.kv{display:grid;gap:12px}
+.kv-row{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.kv-k{font-size:12px;color:var(--muted);font-weight:800}
+.kv-v{font-weight:700;word-break:break-word;white-space:pre-wrap}
+.pin{display:flex;justify-content:center;gap:10px;direction:ltr;margin:8px 0 4px}
+.pin input{width:54px;height:62px;text-align:center;font-size:26px;font-weight:900;border:2px solid var(--border);border-radius:14px;background:var(--surface-2);outline:none}
+.pin input:focus{border-color:var(--primary);background:var(--surface)}
+.pin.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* ===== الإشعارات ===== */
+.toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toast{pointer-events:auto;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:700;box-shadow:var(--shadow-lg);display:flex;gap:10px;align-items:center;animation:toastIn .25s ease;width:100%}
+.toast.success{background:#065f46;color:#fff}.toast.error{background:#991b1b;color:#fff}.toast.info{background:var(--primary-ink);color:#fff}
+[data-theme="dark"] .toast.info{background:#3730a3}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}}
+
+/* ===== التذييل ===== */
+.footer{position:fixed;bottom:0;inset-inline:0;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--border);z-index:40}
+.footer b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+@media (max-width:720px){
+  .topbar-inner{flex-wrap:wrap;padding:10px 14px;gap:10px}
+  .nav{order:3;flex-basis:100%}
+  .brand span.brand-text{display:inline}
+  .page{padding:18px 14px}
+  .page-title{font-size:23px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .stat{padding:12px;gap:10px}.stat-ico{width:38px;height:38px;font-size:18px;border-radius:11px}
+  .stat-value{font-size:21px}.stat-label{font-size:12px}
+  .table{font-size:14px}.table td,.table th{padding:10px}
+  .modal-card{padding:20px}
+}
+@media print{
+  .topbar,.footer,.no-print,.toasts{display:none!important}
+  body{background:#fff;padding:0;color:#000}
+  .card,.table-wrap,.stat{box-shadow:none;border-color:#ccc}
+}
+</style>
+
+<style>
+  body{padding-bottom:40px}
+  .chat{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 260px);min-height:460px;overflow:hidden;padding:0}
+  .side{border-inline-end:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+  .side-head{padding:14px;border-bottom:1px solid var(--border)}
+  .tlist{overflow:auto;flex:1}
+  .t{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:.12s}
+  .t:hover{background:var(--surface-2)}
+  .t.active{background:var(--primary-soft)}
+  .t .preview{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .t .time{font-size:11px;color:var(--muted);white-space:nowrap}
+  .unread{background:var(--danger);color:#fff;border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;font-weight:900;padding:0 6px}
+  .main{display:flex;flex-direction:column;min-height:0;min-width:0}
+  .main-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+  .sep{align-self:center;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:800;padding:3px 12px;border-radius:999px;margin:8px 0}
+  .msg{max-width:72%;padding:10px 14px;border-radius:18px;position:relative;box-shadow:var(--shadow)}
+  .msg.teacher{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-start-start-radius:6px}
+  .msg.admin{align-self:flex-end;background:var(--grad);color:#fff;border-start-end-radius:6px}
+  .msg .who{font-size:12px;font-weight:900;opacity:.75;margin-bottom:2px}
+  .msg .txt{white-space:pre-wrap;word-break:break-word}
+  .msg .meta{display:flex;gap:10px;align-items:center;font-size:11px;opacity:.75;margin-top:4px}
+  .msg .acts{display:none;gap:8px}
+  .msg:hover .acts{display:flex}
+  .msg .acts span{cursor:pointer;text-decoration:underline}
+  @media (hover:none){.msg .acts{display:flex}}
+  #backBtn{display:none}
+  .composer{display:flex;gap:10px;padding:12px;border-top:1px solid var(--border);align-items:flex-end}
+  .composer textarea{resize:none;max-height:140px;min-height:46px}
+  @media(max-width:820px){
+    .chat{grid-template-columns:1fr;height:calc(100vh - 290px)}
+    .chat.has-active .side{display:none}
+    .chat:not(.has-active) .main{display:none}
+    .msg{max-width:88%}
+    #backBtn{display:grid}
+  }
+</style>
+</head>
+<body>
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <button class="brand ai-launch" id="aiaFab" title="المساعد الذكي" aria-label="فتح المساعد الذكي"><span class="brand-logo aia-pulse">✦</span><span class="brand-text">المساعد الذكي</span></button>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" title="الوضع الليلي" aria-label="تبديل الوضع الليلي">🌙</button>
+  </div>
+</header>
+
+<main class="page" style="padding-bottom:8px">
+  <div class="page-head" style="margin-bottom:14px">
+    <div><h1 class="page-title">دردشة المعلمين</h1><p class="page-sub">الرد على رسائل المعلمين مباشرة</p></div>
+    <div class="row no-print"><button class="btn btn-ghost btn-sm" id="soundBtn">🔔 الصوت: مفعل</button></div>
+  </div>
+  <div class="card chat" id="chat">
+    <aside class="side">
+      <div class="side-head">
+        <div class="field"><span class="field-ico">🔎</span><input class="input search" id="search" placeholder="ابحث عن معلم..."></div>
+        <div class="seg" id="seg" style="margin-top:10px;width:100%"><button data-f="all" class="on" style="flex:1">الكل</button><button data-f="active" style="flex:1">لديها رسائل</button><button data-f="unread" style="flex:1">غير مقروءة</button></div>
+      </div>
+      <div class="tlist" id="tlist"><div class="empty"><div class="spinner"></div>جارٍ تحميل المحادثات...</div></div>
+    </aside>
+    <section class="main">
+      <div class="main-head">
+        <button class="icon-btn" id="backBtn" title="رجوع">→</button>
+        <div class="avatar" id="aAvatar">؟</div>
+        <div style="flex:1;min-width:0"><div style="font-weight:900" id="aName">اختر معلماً</div><div style="font-size:12px;color:var(--muted)" id="aInfo"></div></div>
+        <button class="btn btn-sm btn-danger-soft hidden" id="clearBtn">🗑️ حذف المحادثة</button>
+      </div>
+      <div class="msgs" id="msgs"><div class="empty" style="margin:auto"><span class="empty-ico">💬</span>اختر معلماً من القائمة لعرض المحادثة</div></div>
+      <div class="composer">
+        <textarea class="textarea" id="input" rows="1" placeholder="اكتب ردك هنا... (Enter للإرسال، Shift+Enter لسطر جديد)" disabled></textarea>
+        <button class="btn btn-primary" id="sendBtn" disabled>إرسال ➤</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="modal" id="uiDialog" role="dialog" aria-modal="true">
+  <div class="modal-card sm">
+    <div id="uiDialogIco" style="font-size:40px;margin-bottom:6px">⚠️</div>
+    <h3 class="modal-title" id="uiDialogTitle"></h3>
+    <p class="modal-text" id="uiDialogText"></p>
+    <div class="pin hidden" id="uiPin">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="1" autocomplete="off">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="uiDialogCancel">إلغاء</button>
+      <button class="btn btn-primary" id="uiDialogOk">تأكيد</button>
+    </div>
+  </div>
+</div>
+<footer class="footer">برمجة الطالب&nbsp;<b>يحيى حميد</b>&nbsp;| جميع الحقوق محفوظة ©</footer>
+<script>
+/* ===== أدوات مشتركة ===== */
+const UI = (() => {
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  // الوضع الليلي
+  function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); const b = document.getElementById('themeBtn'); if (b) b.textContent = t === 'dark' ? '☀️' : '🌙'; }
+  applyTheme(store.get('uiTheme', (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'));
+  function toggleTheme() { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; store.set('uiTheme', t); applyTheme(t); document.dispatchEvent(new CustomEvent('themechange', { detail: t })); }
+
+  function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  function toast(msg, type = 'info', ms = 3200) {
+    const wrap = document.getElementById('toasts'); if (!wrap) return;
+    const ico = { success: '✅', error: '⛔', info: 'ℹ️' }[type] || 'ℹ️';
+    const el = document.createElement('div'); el.className = 'toast ' + type;
+    el.innerHTML = `<span>${ico}</span><span>${esc(msg)}</span>`;
+    wrap.appendChild(el);
+    setTimeout(() => { el.style.transition = '.3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, ms);
+  }
+
+  // نافذة تأكيد / رمز سري — ترجع Promise
+  function dialog({ title, text = '', icon = '⚠️', okText = 'تأكيد', danger = false, pin = null }) {
+    return new Promise(resolve => {
+      const m = document.getElementById('uiDialog');
+      const pinBox = document.getElementById('uiPin');
+      const inputs = [...pinBox.querySelectorAll('input')];
+      const ok = document.getElementById('uiDialogOk'), cancel = document.getElementById('uiDialogCancel');
+      document.getElementById('uiDialogTitle').textContent = title;
+      document.getElementById('uiDialogText').textContent = text;
+      document.getElementById('uiDialogIco').textContent = icon;
+      ok.textContent = okText; ok.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+      pinBox.classList.toggle('hidden', !pin); ok.classList.toggle('hidden', !!pin);
+      inputs.forEach(i => i.value = '');
+      const close = (v) => { m.classList.remove('open'); ok.onclick = cancel.onclick = m.onclick = null; inputs.forEach(i => { i.oninput = i.onkeydown = null; }); document.removeEventListener('keydown', onKey); resolve(v); };
+      const onKey = (e) => { if (e.key === 'Escape') close(false); if (e.key === 'Enter' && !pin) close(true); };
+      document.addEventListener('keydown', onKey);
+      ok.onclick = () => close(true); cancel.onclick = () => close(false);
+      m.onclick = (e) => { if (e.target === m) close(false); };
+      if (pin) {
+        inputs.forEach((inp, i) => {
+          inp.oninput = () => {
+            inp.value = inp.value.replace(/[^0-9٠-٩]/g, '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            if (inp.value && i < 3) inputs[i + 1].focus();
+            const code = inputs.map(x => x.value).join('');
+            if (code.length === 4) {
+              if ([].concat(pin).includes(code)) close(true);
+              else { pinBox.classList.remove('shake'); void pinBox.offsetWidth; pinBox.classList.add('shake'); inputs.forEach(x => x.value = ''); inputs[0].focus(); toast('الرمز غير صحيح', 'error'); }
+            }
+          };
+          inp.onkeydown = (e) => { if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus(); };
+        });
+      }
+      m.classList.add('open');
+      setTimeout(() => (pin ? inputs[0] : ok).focus(), 50);
+    });
+  }
+
+  const toEn = s => String(s ?? '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[‎‏؜]/g, '').trim();
+  // يحوّل أي صيغة تاريخ إلى YYYY-MM-DD
+  function normDate(v) {
+    let s = toEn(v); if (!s || s === '-') return '';
+    if (s.includes('T')) { const d = new Date(s); if (!isNaN(d)) return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Bahrain' }); s = s.split('T')[0]; }
+    const p = s.split(/[\/\-\s.]+/);
+    if (p.length >= 3) {
+      if (p[0].length === 4) return `${p[0]}-${p[1].padStart(2, '0')}-${p[2].padStart(2, '0')}`;
+      if (p[2].length === 4) return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+    }
+    return s;
+  }
+  const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bahrain' });
+  // معرّف ثابت للنص (لا يتغير بتغير ترتيب الصفوف)
+  function hashId(str) { let h = 5381; for (const ch of String(str)) h = ((h << 5) + h + ch.codePointAt(0)) >>> 0; return 'id' + h.toString(36); }
+  const initials = n => String(n || '؟').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join(' ');
+
+  return { store, toggleTheme, esc, toast, dialog, toEn, normDate, today, hashId, initials };
+})();
+document.getElementById('themeBtn')?.addEventListener('click', UI.toggleTheme);
+// يحدّث النسخة المخزنة القديمة تلقائياً (إن وُجد ملف sw.js في نفس المستودع)
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {}));
+}
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDhWSokVjK2e31wMmM6sPWvRp8DrtZSc0",
+    authDomain: "submit-e8c66.firebaseapp.com",
+    databaseURL: "https://submit-e8c66-default-rtdb.firebaseio.com",
+    projectId: "submit-e8c66",
+    storageBucket: "submit-e8c66.firebasestorage.app",
+    messagingSenderId: "193644814442",
+    appId: "1:193644814442:web:056e97d9dcac8c2f25aa13"
+  };
+  let db = null;
+  try { if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); db = firebase.database(); }
+  catch (e) { console.error('Firebase', e); }
+</script>
+
+<script>
+const STATIC_TEACHERS = ["أحمد ادولحيان","أحمد ابراهيم سلمان الحلال","أحمد ابراهيم عبدالحميد حسنين","أحمد السعيد رمضان علي","أحمد جابر حسين عبدالرحيم","أحمد صبحي ابراهيم جاد","أحمد عبدالرؤوف ادريس عيد","أحمد عبدالغني يوسف تقي","أحمد محمود عبدالحميد غنوش","أحمد منير عبدالستار موسى","أحمد يسري الزهري","اسامه شوقي سالم عزالدين","اشرف البطل محمود صالح","السيد مشعل جعفر محمد درويش","بشار محمد حسين الخلفان","بندر محمد عبدالله المفلح","حسن علي تركي متروك","حماد شعبان عبدالجواد علي","خالد علي صالح احمد","دخيل علي دخيل مقدم","رمضان محمد محمد رمضان","زهير عمار احمد مرغاد","سلطان سعود محمد الدوسري","صالح مرزوق عودة الجهني","عباس احمد عبدالله سرحان","عباس السيدجواد كاظم البحراني","عبدالحميد محمد عبدالحميد شلقامي","عبدالرحيم الجبيلي عبدالعظيم السعدني","عبدالعزيز سلمان عبدالله حسين","عبدالعزيز منصور احمد ناصر","عبدالله الشيخ ابراهيم آل مبارك","عبدالله سامي حسين الدوسري","عدي محمد اسحاق عبدالرحمن","عطية محمد عبد الله يوسف","علي عماد الدين ايوب","عماد حسين حسن ابوحميد","كميل حسن علي ابراهيم","مجدي محمد علي شحاتة بدر","محسن سيف النصر محمود ابراهيم","محمد ابوالفتوح محمود احمد","محمد احمد رجعه المركاز","محمد احمد مصطفى الخطيب","محمد صالح عبدالمعتمد صالح","محمود صلاح عبدالنواب عزيز","مصطفى العربي مصطفى يوسف","مناف احمد عبدالله النجار","منهل علي حسن ابوادريس","موسى عبدالمعين محمد القرني","نبيل عادل عبدالحسين محمد","هشام بيجا","هشام ماجد السيد هاشم","ياسر محمد عطيه هيكل","يحيى يحيى عبدالباقي عبدالباقي","يوسف أحمد حسن ربيع","حسن أحمد المؤمن"];
+const $ = id => document.getElementById(id);
+const chats = {};                                   // name -> {id: msg}
+const orphans = {};                                 // رسائل محفوظة خطأً مباشرة داخل messages (بدون مجلد معلم)
+const ORPHAN_NAME = 'رسائل بدون اسم معلم';
+STATIC_TEACHERS.forEach(n => chats[n] = {});
+let active = null, filter = 'all', loaded = false;
+let lastSeen = UI.store.get('chatLastSeen', {});     // آخر وقت قرأت فيه كل محادثة
+let sound = UI.store.get('chatSound', true);
+const baseTitle = document.title;
+
+const sorted = obj => Object.entries(obj || {}).filter(([, m]) => m && m.text).sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+const msgsOf = n => {
+  const out = { ...(chats[n] || {}) };
+  Object.entries(orphans).forEach(([k, m]) => { if ((m.sender && chats.hasOwnProperty(m.sender) && m.sender !== ORPHAN_NAME ? m.sender : ORPHAN_NAME) === n) out['~' + k] = m; });
+  return out;
+};
+const msgPath = id => id.startsWith('~') ? `messages/${id.slice(1)}` : `messages/${active}/${id}`;
+const lastMsg = n => { const s = sorted(msgsOf(n)); return s.length ? s[s.length - 1][1] : null; };
+const unreadOf = n => n === active ? 0 : sorted(msgsOf(n)).filter(([, m]) => m.role !== 'admin' && (m.timestamp || 0) > (lastSeen[n] || 0)).length;
+const fmtTime = ts => ts ? new Date(ts).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' }) : '';
+function fmtDay(ts) {
+  const d = new Date(ts), t = new Date(); const y = new Date(); y.setDate(t.getDate() - 1);
+  if (d.toDateString() === t.toDateString()) return 'اليوم';
+  if (d.toDateString() === y.toDateString()) return 'أمس';
+  return d.toLocaleDateString('ar', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function shortWhen(ts) { if (!ts) return ''; const d = new Date(ts); return d.toDateString() === new Date().toDateString() ? fmtTime(ts) : d.toLocaleDateString('ar', { day: 'numeric', month: 'short' }); }
+
+function renderList() {
+  const q = $('search').value.trim();
+  let names = Object.keys(chats).filter(n => !q || n.includes(q));
+  if (filter === 'active') names = names.filter(n => lastMsg(n));
+  if (filter === 'unread') names = names.filter(n => unreadOf(n) > 0);
+  names.sort((a, b) => ((lastMsg(b) || {}).timestamp || 0) - ((lastMsg(a) || {}).timestamp || 0) || a.localeCompare(b, 'ar'));
+  $('tlist').innerHTML = names.length ? names.map(n => {
+    const lm = lastMsg(n), u = unreadOf(n);
+    return `<div class="t ${n === active ? 'active' : ''}" data-n="${UI.esc(n)}">
+      <div class="avatar">${UI.esc(UI.initials(n))}</div>
+      <div style="flex:1;min-width:0"><div class="item-title" style="${u ? 'font-weight:900' : ''}">${UI.esc(n)}</div>
+        <div class="preview">${lm ? (lm.role === 'admin' ? 'أنت: ' : '') + UI.esc(lm.text) : 'لا توجد رسائل'}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="time">${lm ? shortWhen(lm.timestamp) : ''}</span>${u ? `<span class="unread">${u}</span>` : ''}</div></div>`;
+  }).join('') : `<div class="empty"><span class="empty-ico">📭</span>لا توجد محادثات</div>`;
+  const total = Object.keys(chats).reduce((s, n) => s + unreadOf(n), 0);
+  document.title = total ? `(${total}) ${baseTitle}` : baseTitle;
+}
+
+function renderMsgs() {
+  const box = $('msgs');
+  if (!active) return;
+  const list = sorted(msgsOf(active));
+  $('aInfo').textContent = list.length ? `${list.length} رسالة` : 'لا توجد رسائل بعد';
+  if (!list.length) { box.innerHTML = `<div class="empty" style="margin:auto"><span class="empty-ico">👋</span>ابدأ المحادثة الآن</div>`; return; }
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  let lastDay = '', html = '';
+  list.forEach(([id, m]) => {
+    const day = m.timestamp ? new Date(m.timestamp).toDateString() : '';
+    if (day && day !== lastDay) { html += `<div class="sep">${fmtDay(m.timestamp)}</div>`; lastDay = day; }
+    const mine = m.role === 'admin';
+    html += `<div class="msg ${mine ? 'admin' : 'teacher'}" data-id="${UI.esc(id)}">
+      ${mine ? '' : `<div class="who">${UI.esc(m.sender || active)}</div>`}
+      <div class="txt">${UI.esc(m.text)}</div>
+      <div class="meta"><span>${fmtTime(m.timestamp)}</span>${m.edited ? '<span>(معدّلة)</span>' : ''}
+        <span class="acts"><span data-a="quote">اقتباس</span>${mine ? '<span data-a="edit">تعديل</span><span data-a="del">حذف</span>' : ''}</span></div></div>`;
+  });
+  box.innerHTML = html;
+  if (nearBottom || box.dataset.for !== active) box.scrollTop = box.scrollHeight;
+  box.dataset.for = active;
+}
+
+function select(n) {
+  active = n; lastSeen[n] = Date.now(); UI.store.set('chatLastSeen', lastSeen);
+  $('chat').classList.add('has-active');
+  $('aName').textContent = n; $('aAvatar').textContent = UI.initials(n);
+  $('clearBtn').classList.remove('hidden'); $('input').disabled = $('sendBtn').disabled = false;
+  $('msgs').dataset.for = ''; renderMsgs(); renderList();
+  if (matchMedia('(hover:hover)').matches) $('input').focus();
+}
+
+/* ===== صوت التنبيه ===== */
+let actx;
+function beep() {
+  if (!sound) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain();
+    o.connect(g); g.connect(actx.destination); o.frequency.value = 880; g.gain.setValueAtTime(.15, actx.currentTime); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + .35); o.start(); o.stop(actx.currentTime + .35); } catch (e) {}
+}
+function setSoundBtn() { $('soundBtn').textContent = sound ? '🔔 الصوت: مفعل' : '🔕 الصوت: متوقف'; }
+$('soundBtn').onclick = () => { sound = !sound; UI.store.set('chatSound', sound); setSoundBtn(); }; setSoundBtn();
+
+/* ===== Firebase ===== */
+function isMessage(v) { return v && typeof v === 'object' && ['text', 'sender', 'role', 'timestamp'].some(k => v[k] !== undefined && typeof v[k] !== 'object'); }
+function placeOrphan(m) { const who = m.sender && m.sender !== 'الإدارة' ? m.sender : ORPHAN_NAME; if (!chats.hasOwnProperty(who)) chats[who] = {}; }
+function onData(snap) {
+  const n = snap.key, val = snap.val();
+  if (isMessage(val)) {   // رسالة محفوظة في المكان الخطأ: تُعرض داخل محادثة صاحبها
+    const isNew = loaded && !orphans[n] && val.role !== 'admin';
+    orphans[n] = val; placeOrphan(val);
+    if (isNew) beep();
+    if (active) renderMsgs(); renderList(); return;
+  }
+  const before = chats[n] || {}, now = val || {};
+  const fresh = loaded && Object.keys(now).some(id => !before[id] && now[id] && now[id].role !== 'admin');
+  chats[n] = now;
+  if (fresh) { beep(); if (n !== active) UI.toast(`رسالة جديدة من ${n}`, 'info'); }
+  if (n === active) { lastSeen[n] = Date.now(); UI.store.set('chatLastSeen', lastSeen); renderMsgs(); }
+  renderList();
+}
+if (db) {
+  db.ref('school/teachers').on('value', s => { Object.values(s.val() || {}).forEach(t => { if (t && t.name && !chats.hasOwnProperty(t.name)) chats[t.name] = {}; }); renderList(); }, e => console.warn(e));
+  const ref = db.ref('messages');
+  ref.on('child_added', onData); ref.on('child_changed', onData);
+  ref.on('child_removed', s => { if (orphans[s.key]) { delete orphans[s.key]; } else chats[s.key] = {}; if (active) renderMsgs(); renderList(); });
+  ref.once('value').then(() => { loaded = true; renderList(); }).catch(() => UI.toast('تعذّر تحميل المحادثات', 'error'));
+} else { $('tlist').innerHTML = `<div class="alert alert-danger" style="margin:14px">⛔ تعذّر الاتصال بقاعدة البيانات</div>`; }
+
+/* ===== الإرسال والتحكم ===== */
+function send() {
+  const t = $('input').value.trim(); if (!t || !active || !db) return;
+  if (active === ORPHAN_NAME) return UI.toast('هذه رسائل بدون اسم معلم، لا يمكن الرد عليها', 'error');
+  db.ref('messages/' + active).push({ text: t, sender: 'الإدارة', role: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP })
+    .catch(() => UI.toast('لم يتم إرسال الرسالة', 'error'));
+  $('input').value = ''; autoSize();
+}
+function autoSize() { const i = $('input'); i.style.height = 'auto'; i.style.height = Math.min(i.scrollHeight, 140) + 'px'; }
+$('input').addEventListener('input', autoSize);
+$('input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+$('sendBtn').onclick = send;
+$('tlist').addEventListener('click', e => { const t = e.target.closest('[data-n]'); if (t) select(t.dataset.n); });
+$('search').addEventListener('input', renderList);
+$('seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; filter = b.dataset.f; [...$('seg').children].forEach(x => x.classList.toggle('on', x === b)); renderList(); });
+$('backBtn').onclick = () => { active = null; $('chat').classList.remove('has-active'); renderList(); };
+$('msgs').addEventListener('click', async e => {
+  const a = e.target.closest('[data-a]'); if (!a) return;
+  const id = a.closest('.msg').dataset.id, m = msgsOf(active)[id]; if (!m) return;
+  if (a.dataset.a === 'quote') { $('input').value = `«${m.text}»\n`; $('input').focus(); autoSize(); }
+  if (a.dataset.a === 'del' && await UI.dialog({ title: 'حذف الرسالة؟', text: 'سيتم حذفها من المحادثة نهائياً', icon: '🗑️', okText: 'حذف', danger: true }))
+    db.ref(msgPath(id)).remove();
+  if (a.dataset.a === 'edit') {
+    const t = prompt('تعديل الرسالة:', m.text);
+    if (t && t.trim() && t.trim() !== m.text) db.ref(msgPath(id)).update({ text: t.trim(), edited: true });
+  }
+});
+$('clearBtn').onclick = async () => {
+  if (!active) return;
+  if (await UI.dialog({ title: 'حذف المحادثة كاملة؟', text: `سيتم حذف جميع رسائل «${active}» نهائياً`, icon: '🗑️', okText: 'حذف', danger: true })) {
+    const jobs = Object.keys(msgsOf(active)).filter(id => id.startsWith('~')).map(id => db.ref(msgPath(id)).remove());
+    if (active !== ORPHAN_NAME) jobs.push(db.ref('messages/' + active).remove());
+    Promise.all(jobs).then(() => UI.toast('تم حذف المحادثة', 'success'));
+  }
+};
+renderList();
+</script>
+<script>
+window.AI_PAGE = {
+  id: 'chat', title: 'دردشة المعلمين',
+  intro: 'أنا متخصص في دردشة المعلمين. أستطيع تلخيص الرسائل وإخبارك من ينتظر رداً، ومساعدتك في كتابة الرد.',
+  chips: ['من المعلمون الذين ينتظرون رداً؟', 'لخّص آخر الرسائل', 'اكتب رداً مهذباً على آخر رسالة', 'كم رسالة غير مقروءة؟'],
+  context: () => {
+    const L = [`تاريخ اليوم: ${UI.today()}`];
+    if (active) L.push(`المحادثة المفتوحة الآن: ${active}`);
+    L.push('\n[المحادثات] لكل معلم: عدد الرسائل، غير المقروءة، هل آخر رسالة منه (ينتظر رداً)، ثم آخر الرسائل');
+    Object.keys(chats).map(n => [n, sorted(msgsOf(n))]).filter(([, l]) => l.length).sort((a, b) => (b[1][b[1].length - 1][1].timestamp || 0) - (a[1][a[1].length - 1][1].timestamp || 0)).forEach(([n, l]) => {
+      const last = l[l.length - 1][1];
+      L.push(`\n■ ${n} | ${l.length} رسالة | غير مقروءة: ${unreadOf(n)} | ${last.role === 'admin' ? 'آخر رسالة من الإدارة' : 'ينتظر رداً'}`);
+      l.slice(-8).forEach(([, m]) => L.push(`  - ${m.timestamp ? new Date(m.timestamp).toLocaleString('ar-BH') : ''} ${m.role === 'admin' ? 'الإدارة' : n}: ${String(m.text).slice(0, 400)}`));
+    });
+    L.push(`\nمعلمون بدون أي رسائل: ${Object.keys(chats).filter(n => !sorted(msgsOf(n)).length).length}`);
+    return L.join('\n');
+  }
+};
+</script>
+<!-- ===== المساعد الذكي لصفحات الإدارة ===== -->
+<style>
+button.brand{background:none;border:0;padding:0;cursor:pointer;font-family:inherit;font-size:17px;font-weight:900;color:var(--text)}
+button.brand:hover .brand-logo{transform:scale(1.06)}
+.aia-pulse{position:relative}
+.aia-pulse::after{content:"";position:absolute;inset:-4px;border-radius:14px;border:2px solid var(--primary);opacity:0;animation:aiaPulse 2.4s ease-out infinite}
+@keyframes aiaPulse{0%{opacity:.7;transform:scale(.9)}80%,100%{opacity:0;transform:scale(1.25)}}
+.aia-panel{position:fixed;inset:0;z-index:1500;display:none;background:rgba(13,15,40,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.aia-panel.open{display:block;animation:fadeIn .2s}
+.aia-box{position:absolute;top:70px;inset-inline-start:16px;width:420px;max-width:calc(100% - 32px);height:min(640px,calc(100vh - 130px));background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
+.aia-head{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--grad);color:#fff;flex-shrink:0}
+.aia-head .lg{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.aia-head b{font-size:15px}
+.aia-head .x{margin-inline-start:auto;background:rgba(255,255,255,.18);border:0;color:#fff;width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:15px}
+.aia-msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+.aia-msg{max-width:88%;padding:9px 13px;border-radius:16px;line-height:1.8;word-wrap:break-word;font-size:14.5px}
+.aia-msg.user{align-self:flex-start;background:var(--grad);color:#fff;border-start-start-radius:5px;white-space:pre-wrap}
+.aia-msg.model{align-self:flex-end;background:var(--surface);border:1px solid var(--border);border-start-end-radius:5px}
+.aia-msg h2,.aia-msg h3{font-size:15px;margin:8px 0 4px;color:var(--primary-ink)}
+[data-theme="dark"] .aia-msg h2,[data-theme="dark"] .aia-msg h3{color:var(--primary-2)}
+.aia-msg ul,.aia-msg ol{margin:4px 0;padding-inline-start:20px}.aia-msg p{margin:4px 0}
+.aia-msg table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}.aia-msg td,.aia-msg th{border:1px solid var(--border);padding:4px 6px}
+.aia-welcome{text-align:center;color:var(--muted);padding:14px 6px;font-weight:600}
+.aia-welcome .big{font-size:36px}
+.aia-chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0}
+.aia-chips .chip{font-size:13px;padding:5px 11px}
+.aia-comp{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);align-items:flex-end}
+.aia-comp textarea{resize:none;min-height:44px;max-height:120px;font-size:14.5px}
+.aia-typing{display:inline-flex;gap:4px;padding:4px 2px}
+.aia-typing i{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:aiaDot 1s infinite}
+.aia-typing i:nth-child(2){animation-delay:.15s}.aia-typing i:nth-child(3){animation-delay:.3s}
+@keyframes aiaDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media(max-width:600px){.aia-box{inset:0;width:auto;max-width:none;height:auto;border-radius:0}}
+@media print{.aia-panel{display:none!important}}
+</style>
+<div class="aia-panel" id="aiaPanel" role="dialog" aria-modal="true" aria-label="المساعد الذكي">
+  <div class="aia-box">
+    <div class="aia-head"><span class="lg">✦</span><b>المساعد الذكي</b><button class="x" id="aiaClose" aria-label="إغلاق">✕</button></div>
+    <div class="aia-msgs" id="aiaMsgs"><div class="aia-welcome" id="aiaWelcome"><div class="big">✦</div><div id="aiaIntro"></div></div></div>
+    <div class="aia-chips" id="aiaChips"></div>
+    <div class="aia-comp">
+      <textarea class="textarea" id="aiaInput" rows="1" placeholder="اسأل عن هذه الصفحة أو بياناتها..."></textarea>
+      <button class="btn btn-primary" id="aiaSend">إرسال ➤</button>
+    </div>
+  </div>
+</div>
+<script>
+/* رابط Apps Script للمساعد الذكي (نفس رابط الموقع الرئيسي) */
+const AI_URL = "https://script.google.com/macros/s/AKfycbyT3LkNM9vig5WegHLa-_lkACMhyrVUfRGwkh2YATWuANUhPCO0tZYPF6LSNpPkpTdk/exec";
+(function () {
+  const P = window.AI_PAGE; if (!P) return;
+  const $ = id => document.getElementById(id);
+  let chat = [], busy = false;
+  $('aiaIntro').textContent = P.intro;
+  $('aiaChips').innerHTML = (P.chips || []).map(c => `<button class="chip" data-q="${UI.esc(c)}">${UI.esc(c)}</button>`).join('');
+
+  const open = () => { $('aiaPanel').classList.add('open'); if (matchMedia('(hover:hover)').matches) setTimeout(() => $('aiaInput').focus(), 50); };
+  const close = () => $('aiaPanel').classList.remove('open');
+  $('aiaFab').onclick = open; $('aiaClose').onclick = close;
+  $('aiaPanel').addEventListener('click', e => { if (e.target.id === 'aiaPanel') close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('aiaPanel').classList.contains('open')) close(); });
+
+  function md(src) {
+    const inline = s => UI.esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>');
+    let html = '', list = null, table = [];
+    const fl = () => { if (list) { html += `</${list}>`; list = null; } };
+    const ft = () => { if (!table.length) return; const rows = table.filter(r => !/^\s*\|?\s*:?-{2,}/.test(r)).map(r => r.trim().replace(/^\||\|$/g, '').split('|')); html += '<table>' + rows.map((r, i) => '<tr>' + r.map(c => i ? `<td>${inline(c.trim())}</td>` : `<th>${inline(c.trim())}</th>`).join('') + '</tr>').join('') + '</table>'; table = []; };
+    for (const line of String(src || '').replace(/\r/g, '').split('\n')) {
+      if (/^\s*\|.*\|\s*$/.test(line)) { fl(); table.push(line); continue; } else ft();
+      let m;
+      if ((m = line.match(/^\s*#{1,4}\s+(.*)/))) { fl(); html += `<h3>${inline(m[1])}</h3>`; }
+      else if ((m = line.match(/^\s*[-*•]\s+(.*)/))) { if (list !== 'ul') { fl(); html += '<ul>'; list = 'ul'; } html += `<li>${inline(m[1])}</li>`; }
+      else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== 'ol') { fl(); html += '<ol>'; list = 'ol'; } html += `<li>${inline(m[1])}</li>`; }
+      else if (!line.trim()) fl();
+      else { fl(); html += `<p>${inline(line)}</p>`; }
+    }
+    fl(); ft(); return html;
+  }
+  function add(role, html) {
+    $('aiaWelcome')?.remove(); $('aiaChips').style.display = 'none';
+    const d = document.createElement('div'); d.className = 'aia-msg ' + role; d.innerHTML = html;
+    $('aiaMsgs').appendChild(d); $('aiaMsgs').scrollTop = $('aiaMsgs').scrollHeight; return d;
+  }
+  async function send(text) {
+    text = (text ?? $('aiaInput').value).trim(); if (!text || busy) return;
+    $('aiaInput').value = ''; size();
+    add('user', UI.esc(text)); chat.push({ role: 'user', text });
+    const pend = add('model', '<div class="aia-typing"><i></i><i></i><i></i></div>');
+    busy = true; $('aiaSend').disabled = true;
+    try {
+      let ctx = '';
+      try { ctx = P.context(); } catch (e) { console.error(e); ctx = '(تعذّر تجهيز بيانات الصفحة)'; }
+      let res;
+      try { res = await fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ mode: 'page', page: P.id, context: ctx, messages: chat, teacher: 'الإدارة - ' + P.title }) }); }
+      catch (e) { throw new Error(location.protocol.startsWith('http') ? 'تعذّر الوصول إلى المساعد. تأكد من الإنترنت.' : 'افتح الصفحة من رابطها على GitHub حتى يعمل المساعد.'); }
+      let data; try { data = await res.json(); } catch (e) { throw new Error('المساعد لم يرجع رداً صحيحاً. حاول مرة أخرى.'); }
+      if (data.error) throw new Error(data.error);
+      chat.push({ role: 'model', text: data.text });
+      pend.innerHTML = md(data.text);
+    } catch (e) { chat.pop(); pend.innerHTML = `<div class="alert alert-danger">⛔ ${UI.esc(e.message)}</div>`; }
+    finally { busy = false; $('aiaSend').disabled = false; $('aiaMsgs').scrollTop = $('aiaMsgs').scrollHeight; }
+  }
+  function size() { const i = $('aiaInput'); i.style.height = 'auto'; i.style.height = Math.min(i.scrollHeight, 120) + 'px'; }
+  $('aiaInput').addEventListener('input', size);
+  $('aiaInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  $('aiaSend').onclick = () => send();
+  $('aiaChips').addEventListener('click', e => {
+    const c = e.target.closest('[data-q]'); if (!c) return;
+    const q = c.dataset.q;
+    if (q.includes('...')) { const i = $('aiaInput'); i.value = q.replace(/\.\.\.؟?/, '').trim() + ' '; i.focus(); i.setSelectionRange(i.value.length, i.value.length); size(); }
+    else send(q);
+  });
+})();
+</script>
+
+</body>
+</html>
